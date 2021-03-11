@@ -119,8 +119,8 @@ exit_button.place(x=560, y=10)
                             "and English to Bengali as Well ................", bg="white", font=("regular",10))
 desc_label.place(x=20, y=250)'''
 
-# creed
-credit_label = Label(root, text="Created by Shuvojit & Somnath")
-credit_label.place(x=425, y=380)
+# credit
+credit_label = Label(root, text="Created by Shuvojit Biswas")
+credit_label.place(x=453, y=380)
 
 root.mainloop()  # helps to hold application interface
