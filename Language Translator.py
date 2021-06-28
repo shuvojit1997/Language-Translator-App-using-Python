@@ -1,17 +1,26 @@
 from tkinter import *
+from tkinter import ttk
 from textblob import TextBlob
+import googletrans
 
 # this will create a interface window
 root = Tk()
 
-root.geometry('600x400')
+root.geometry('600x500')
+root.configure(bg="#F9F9F9")
 root.resizable(0, 0)  # to set app interface size as default
 root.title("Language Translator")
 
+langDict = googletrans.LANGUAGES
+langValue = list(langDict.values())
+langKey = langDict.keys()
+
+# print(langValue)
+# print(langKey)
 # to add Background Image
-background_image = PhotoImage(file="C:/Users/Shuvojit/Downloads/Pictures/languages.png")  #?
-image_background = Label(root, image=background_image)
-image_background.place(x=0, y=0)
+# background_image = PhotoImage(file="C:/Users/Shuvojit/Downloads/Pictures/languages.png")  # ?
+# image_background = Label(root, image=background_image)
+# image_background.place(x=0, y=0)
 
 # to check current input language
 default_Language = "English"
@@ -22,27 +31,29 @@ welcome_msg.place(x=20, y=0)
 
 # Input Message
 input_label = Label(root, text="Enter Your Sentence :", bg="white", font=("italic", 14))
-input_label.place(x=20, y=50)
+input_label.place(x=20, y=51)
 
 # Input Textbox
-input_box = Text(root, font=("regular", 10), height=7, width=30)
+input_box = Text(root, font=("regular", 10), height=7, width=78)
 input_box.place(x=25, y=80)
 
 # output Message
 output_label = Label(root, text="Translated Sentence :", bg="white", font=("italic", 14))
-output_label.place(x=300, y=50)
+output_label.place(x=20, y=241)
 
 # Output TextBox
-output_box = Text(root, font=("regular", 10), height=7, width=30)
-output_box.place(x=300, y=80)
+output_box = Text(root, font=("regular", 10), height=7, width=78)
+output_box.place(x=25, y=270)
 
 # Current Input Language
-input_language = Label(root, text="English", bg="white")
-input_language.place(x=110, y=200)
+input_language = ttk.Combobox(root, values=langValue, state="readonly")
+input_language.current(21)
+input_language.place(x=220, y=55)
 
 # Current Output Language
-output_language = Label(root, text="Bengali", bg="white")
-output_language.place(x=390, y=200)
+output_language = ttk.Combobox(root, values=langValue, state="readonly")
+output_language.current(8)
+output_language.place(x=220, y=245)
 
 
 # This function is for translate conversation
@@ -50,15 +61,18 @@ def translate():
     try:
         error_label.configure(text='')
         output_box.delete(0.0, END)  # this will clear previous result
+
         # this will convert string into translatable Textblob format
         input_conversation = TextBlob(input_box.get(0.0, END))
+        from_language = input_conversation.detect_language()
 
-        if default_Language == "English":  # Language Translate English to Bengali
-            output_conversation = input_conversation.translate(from_lang='en', to='bn')
-        else:  # Language Translate Bengali to English
-            output_conversation = input_conversation.translate(from_lang='bn', to='en')
+        output_lang=output_language.get()
 
-        output_box.insert(END, output_conversation)
+        for to_language, value in langDict.items():
+            if output_lang == value:
+                output_conversation = input_conversation.translate(from_lang=from_language, to=to_language)
+                output_box.insert(END, output_conversation)
+
 
     except:
         output_box.delete(0.0, END)
@@ -67,42 +81,49 @@ def translate():
 
 # Language Translate Button
 search_image = PhotoImage(file="C:/Users/Shuvojit/Downloads/Pictures/search.png")
-search_button = Button(root, command=lambda: translate(), image=search_image, width=25, height=25)
-search_button.place(x=257, y=79)
+search_button = Button(root, command=lambda: translate(), text="Translate", font=("italic", 12))
+search_button.place(x=250, y=200)
 
 
 # Changing Language Function
 def changeLanguage():
-    global default_Language
-    if default_Language == "English":
-        input_language.configure(text="Bengali")
-        output_language.configure(text="English")
-        default_Language = "Bengali"
-    else:
-        input_language.configure(text="English")
-        output_language.configure(text="Bengali")
-        default_Language = "English"
+    input_lan = input_language.get()
+    input_lan_index = langValue.index(input_lan)
+
+    output_lan = output_language.get()
+    output_lan_index = langValue.index(output_lan)
+
+    input_language.current(output_lan_index)
+    output_language.current(input_lan_index)
 
 
 # Language Change Button
-change_language_button = Button(root, command=lambda: changeLanguage(), text="Change", font=("regular", 8))
-change_language_button.place(x=248, y=125)
+change_language_button = Button(root, command=lambda: changeLanguage(), text="Alternate Language", font=("regular", 8))
+change_language_button.place(x=25, y=205)
 
 
 # Text Box Clearing Function
-def clearScreen():
+def inputClearScreen():
     input_box.delete(0.0, END)
+    error_label.configure(text='')
+
+
+def outputClearScreen():
     output_box.delete(0.0, END)
     error_label.configure(text='')
 
 
 # error message
 error_label = Label(text="", bg='white', fg='red')
-error_label.place(x=180, y=200)
+error_label.place(x=180, y=400)
 
 # Text Clear Button
-clearButton = Button(root, command=clearScreen, text="Clear", font=("regular", 8), fg="red")
-clearButton.place(x=254, y=160)
+inputClearButton = Button(root, command=inputClearScreen, text="Clear Text", font=("regular", 8), fg="red")
+inputClearButton.place(x=520, y=200)
+
+# Text Clear Button
+outputClearButton = Button(root, command=outputClearScreen, text="Clear Text", font=("regular", 8), fg="red")
+outputClearButton.place(x=520, y=390)
 
 
 # exit function
@@ -121,6 +142,6 @@ desc_label.place(x=20, y=250)'''
 
 # credit
 credit_label = Label(root, text="Created by Shuvojit Biswas")
-credit_label.place(x=453, y=380)
+credit_label.place(x=453, y=480)
 
 root.mainloop()  # helps to hold application interface
